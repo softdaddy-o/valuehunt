@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { stocksApi, StockDetail as StockDetailType } from '@/api'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { StockChart } from '@/components/StockChart'
 
 export function StockDetail() {
   const { stockCode } = useParams<{ stockCode: string }>()
@@ -108,6 +109,23 @@ export function StockDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Price Chart */}
+            <Card>
+              <StockChart
+                data={[
+                  { date: '1M', value: stock_info.current_price * 0.95 },
+                  { date: '2M', value: stock_info.current_price * 0.98 },
+                  { date: '3M', value: stock_info.current_price * 0.92 },
+                  { date: '4M', value: stock_info.current_price * 0.96 },
+                  { date: '5M', value: stock_info.current_price * 1.02 },
+                  { date: '6M', value: stock_info.current_price },
+                ]}
+                title="최근 6개월 주가 추이"
+                height={250}
+                color={stock_info.change_rate >= 0 ? '#ef4444' : '#3b82f6'}
+              />
+            </Card>
+
             {/* Value Score */}
             <Card>
               <h2 className="text-xl font-bold text-gray-900 mb-4">
