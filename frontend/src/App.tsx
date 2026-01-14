@@ -6,6 +6,7 @@ import { Screener } from '@/pages/Screener'
 import { Login } from '@/pages/Login'
 import { Register } from '@/pages/Register'
 import { Watchlist } from '@/pages/Watchlist'
+import { Chat } from '@/pages/Chat'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/stocks/:stockCode" element={<StockDetail />} />
           <Route path="/screener" element={<Screener />} />
           <Route path="/watchlist" element={<Watchlist />} />
+          <Route path="/chat" element={<Chat />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>
