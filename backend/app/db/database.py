@@ -6,13 +6,21 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 
-# Create database engine
-engine = create_engine(
-    settings.DATABASE_URL,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-)
+# Create database engine with conditional pool settings
+if settings.DATABASE_URL.startswith("sqlite"):
+    # SQLite doesn't support pool_size/max_overflow
+    engine = create_engine(
+        settings.DATABASE_URL,
+        connect_args={"check_same_thread": False},
+    )
+else:
+    # PostgreSQL and other databases
+    engine = create_engine(
+        settings.DATABASE_URL,
+        pool_pre_ping=True,
+        pool_size=10,
+        max_overflow=20,
+    )
 
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
