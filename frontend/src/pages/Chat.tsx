@@ -1,18 +1,19 @@
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 import {
   ChatMessage,
-  getMockChatResponse,
+  getAIChatResponse,
   generateMessageId,
   getGreetingMessage,
-} from '@/services/mockChatService'
+  isChatAIAvailable,
+} from '@/services/aiChatService'
 
 export function Chat() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isAIAvailable] = useState(isChatAIAvailable())
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -48,7 +49,10 @@ export function Chat() {
     setIsLoading(true)
 
     try {
-      const response = await getMockChatResponse(input)
+      // Get conversation history (exclude current user message)
+      const history = messages.filter(msg => msg.role !== 'assistant' || msg.content !== getGreetingMessage())
+
+      const response = await getAIChatResponse(input, history)
 
       const assistantMessage: ChatMessage = {
         id: generateMessageId(),
@@ -102,19 +106,35 @@ export function Chat() {
           <p className="text-gray-600 dark:text-gray-400">
             주식 투자에 대한 궁금한 점을 물어보세요
           </p>
-          <div className="mt-4 flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span>
-              데모 모드: 실제 AI가 아닌 미리 준비된 응답입니다. API 키 설정 후 실제 AI를
-              사용할 수 있습니다.
-            </span>
-          </div>
+          {!isAIAvailable && (
+            <div className="mt-4 flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>
+                데모 모드: 실제 AI가 아닌 미리 준비된 응답입니다. API 키 설정 후 실제 AI를
+                사용할 수 있습니다.
+              </span>
+            </div>
+          )}
+          {isAIAvailable && (
+            <div className="mt-4 flex items-center gap-2 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>
+                AI 활성화: Claude Sonnet 4.5로 고품질 투자 분석을 제공합니다.
+              </span>
+            </div>
+          )}
         </div>
 
         <Card className="flex flex-col h-[calc(100vh-250px)] min-h-[500px]">

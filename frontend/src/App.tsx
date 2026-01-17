@@ -7,6 +7,8 @@ import { Login } from '@/pages/Login'
 import { Register } from '@/pages/Register'
 import { Watchlist } from '@/pages/Watchlist'
 import { Chat } from '@/pages/Chat'
+import { StrategySelector } from '@/pages/StrategySelector'
+import { StrategyResults } from '@/pages/StrategyResults'
 
 function App() {
   return (
@@ -16,9 +18,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/stocks/:stockCode" element={<StockDetail />} />
+          <Route path="/stock/:stockCode" element={<StockDetail />} />
           <Route path="/screener" element={<Screener />} />
           <Route path="/watchlist" element={<Watchlist />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/strategies" element={<StrategySelector />} />
+          <Route path="/strategies/:strategyType" element={<StrategyResults />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>

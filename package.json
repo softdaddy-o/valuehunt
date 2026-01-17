@@ -1,0 +1,23 @@
+{
+  "name": "valuehunt",
+  "version": "1.0.0",
+  "description": "ValueHunt - AI-powered undervalued stock discovery platform",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "terraform:setup": "node scripts/setup-terraform.js",
+    "terraform:init": "cd terraform && terraform init",
+    "terraform:apply": "cd terraform && terraform apply",
+    "terraform:sync": "npm run terraform:setup && npm run terraform:apply",
+    "terraform:plan": "cd terraform && terraform plan",
+    "terraform:destroy": "cd terraform && terraform destroy"
+  },
+  "keywords": [
+    "stocks",
+    "ai",
+    "finance",
+    "korean-market"
+  ],
+  "author": "",
+  "license": "MIT"
+}

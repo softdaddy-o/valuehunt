@@ -33,6 +33,12 @@ export function Navigation() {
               >
                 스크리너
               </Link>
+              <Link
+                to="/strategies"
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                AI 전략
+              </Link>
               {isAuthenticated && (
                 <Link
                   to="/watchlist"
