@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
 
+    # Gemini AI (primary)
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+
     # Email
     SENDGRID_API_KEY: str = ""
     FROM_EMAIL: str = "noreply@valuehunt.io"

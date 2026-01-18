@@ -1,16 +1,18 @@
 /**
  * StrategyResults Page
- * Display results from executed strategy
+ * Display results from executed strategy (uses backend API)
  */
 
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import type { AxiosError } from 'axios'
+
 import { RecommendationCard } from '@/components/strategy/RecommendationCard'
 import { Button } from '@/components/ui/Button'
 import { StrategyType, StrategyRequest, StrategyResponse } from '@/services/ai/types'
-import { StrategyService } from '@/services/ai/strategy.service'
-import { getMockStrategyResponse, shouldUseMockStrategy } from '@/services/mockStrategyService'
-import { getAIService } from '@/services/ai'
+import { aiApi } from '@/api'
+import { getMockStrategyResponse } from '@/services/mockStrategyService'
+import { isUserAuthenticated } from '@/services/aiAvailabilityCache'
 
 function getStockCount(type: StrategyType): number {
   if (type === StrategyType.FEAR_DRIVEN_QUALITY) {
@@ -38,14 +40,37 @@ export function StrategyResults(): JSX.Element | null {
     }
 
     try {
-      const useMock = shouldUseMockStrategy()
-      setUsingMock(useMock)
+      if (!isUserAuthenticated()) {
+        setUsingMock(true)
+        const response = await getMockStrategyResponse(request)
+        setResult(response)
+        return
+      }
 
-      const response = useMock
-        ? await getMockStrategyResponse(request)
-        : await new StrategyService(getAIService()).executeStrategy(request)
+      try {
+        const response = await aiApi.executeStrategy(request)
+        setResult(response)
+        setUsingMock(false)
+      } catch (apiError) {
+        const axiosError = apiError as AxiosError
+        console.warn('Backend API failed, falling back to mock:', apiError)
 
-      setResult(response)
+        if (axiosError.response?.status === 401) {
+          setError('로그인이 필요합니다. 로그인 후 다시 시도해주세요.')
+          return
+        }
+
+        if (axiosError.response?.status === 503) {
+          setUsingMock(true)
+          const response = await getMockStrategyResponse(request)
+          setResult(response)
+          return
+        }
+
+        setUsingMock(true)
+        const response = await getMockStrategyResponse(request)
+        setResult(response)
+      }
     } catch (err) {
       console.error('Strategy execution error:', err)
       setError('전략 실행 중 오류가 발생했습니다. 나중에 다시 시도해주세요.')

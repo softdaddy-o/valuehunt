@@ -1,10 +1,18 @@
 /**
  * AI-Powered Chat Service
- * Replaces mock chat service with real AI (Gemini + Claude hybrid)
+ * Uses backend API for AI chat (Gemini)
  */
 
-import { getAIService, isAIServiceAvailable } from './ai'
+import type { AxiosError } from 'axios'
+
+import { aiApi } from '@/api'
 import { getMockChatResponse, getGreetingMessage } from './mockChatService'
+import {
+  isUserAuthenticated,
+  isAIAvailableForUser,
+  isAIAvailableForUserSync,
+  resetAIAvailabilityCache as resetCache,
+} from './aiAvailabilityCache'
 
 export interface ChatMessage {
   id: string
@@ -14,32 +22,28 @@ export interface ChatMessage {
 }
 
 /**
- * Get AI chat response
+ * Get AI chat response via backend API
  * Falls back to mock service if AI is not available
  */
 export async function getAIChatResponse(
   userMessage: string,
   conversationHistory?: ChatMessage[]
 ): Promise<string> {
-  // Check if AI service is available
-  if (!isAIServiceAvailable()) {
-    console.warn('AI service not available, using mock responses')
+  if (!isUserAuthenticated()) {
+    console.warn('User not authenticated, using mock responses')
     return getMockChatResponse(userMessage)
   }
 
   try {
-    const aiService = getAIService()
-
-    // Convert conversation history to expected format
     const history =
       conversationHistory
-        ?.slice(-6) // Keep last 6 messages for context (3 exchanges)
+        ?.slice(-6)
         .map((msg) => ({
-          role: msg.role,
+          role: msg.role as 'user' | 'assistant',
           content: msg.content,
         })) || []
 
-    const response = await aiService.chat({
+    const response = await aiApi.chat({
       message: userMessage,
       context: {
         conversationHistory: history,
@@ -48,7 +52,16 @@ export async function getAIChatResponse(
 
     return response.reply
   } catch (error) {
+    const axiosError = error as AxiosError
     console.error('AI chat error, falling back to mock:', error)
+
+    if (axiosError.response?.status === 401) {
+      return '로그인이 필요합니다. 로그인 후 다시 시도해주세요.'
+    }
+    if (axiosError.response?.status === 503) {
+      return 'AI 서비스가 현재 사용 불가능합니다. 잠시 후 다시 시도해주세요.'
+    }
+
     return getMockChatResponse(userMessage)
   }
 }
@@ -68,6 +81,20 @@ export { getGreetingMessage }
 /**
  * Check if AI is available for chat
  */
-export function isChatAIAvailable(): boolean {
-  return isAIServiceAvailable()
+export async function isChatAIAvailable(): Promise<boolean> {
+  return isAIAvailableForUser()
+}
+
+/**
+ * Synchronous check (uses cached value)
+ */
+export function isChatAIAvailableSync(): boolean {
+  return isAIAvailableForUserSync()
+}
+
+/**
+ * Reset AI availability cache (useful after login/logout)
+ */
+export function resetAIAvailabilityCache(): void {
+  resetCache()
 }

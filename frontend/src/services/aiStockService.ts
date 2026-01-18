@@ -1,26 +1,30 @@
 /**
  * AI Stock Analysis Service
- * Provides AI-powered stock analysis for the application
+ * Uses backend API for AI-powered stock analysis (Gemini)
  */
 
-import { getAIService, isAIServiceAvailable, AnalysisType, StockAnalysisRequest } from './ai'
-import { StockDetail, AIAnalysis } from '@/types/api'
+import type { AxiosError } from 'axios'
+
+import { aiApi } from '@/api'
+import type { StockDetail, AIAnalysis } from '@/types/api'
+import type { StockAnalysisRequest } from './ai/types'
+import {
+  isUserAuthenticated,
+  isAIAvailableForUser,
+  isAIAvailableForUserSync,
+  resetAIAvailabilityCache as resetCache,
+} from './aiAvailabilityCache'
 
 /**
- * Generate AI analysis for a stock using Claude Sonnet 4.5 for best quality
+ * Generate AI analysis for a stock via backend API
  */
-export async function generateStockAnalysis(
-  stockDetail: StockDetail,
-  analysisType: AnalysisType = AnalysisType.DEEP
-): Promise<AIAnalysis> {
-  if (!isAIServiceAvailable()) {
-    console.warn('AI service not available, returning placeholder analysis')
+export async function generateStockAnalysis(stockDetail: StockDetail): Promise<AIAnalysis> {
+  if (!isUserAuthenticated()) {
+    console.warn('User not authenticated, returning placeholder analysis')
     return generatePlaceholderAnalysis(stockDetail)
   }
 
   try {
-    const aiService = getAIService()
-
     const request: StockAnalysisRequest = {
       stockCode: stockDetail.stock_info.code,
       stockName: stockDetail.stock_info.name,
@@ -38,7 +42,7 @@ export async function generateStockAnalysis(
       },
     }
 
-    const response = await aiService.analyzeStock(request, analysisType)
+    const response = await aiApi.analyzeStock(request)
 
     return {
       summary: response.summary,
@@ -46,13 +50,23 @@ export async function generateStockAnalysis(
       risks: response.risks,
     }
   } catch (error) {
+    const axiosError = error as AxiosError
     console.error('Failed to generate AI analysis:', error)
+
+    if (axiosError.response?.status === 401) {
+      return {
+        summary: '로그인이 필요합니다.',
+        strengths: ['로그인 후 AI 분석을 이용해주세요'],
+        risks: ['인증 오류'],
+      }
+    }
+
     return generatePlaceholderAnalysis(stockDetail)
   }
 }
 
 /**
- * Generate a short AI summary for stock cards using Claude for quality
+ * Generate a short AI summary for stock cards via backend API
  */
 export async function generateStockSummary(
   stockCode: string,
@@ -64,13 +78,11 @@ export async function generateStockSummary(
     ROE?: number | null
   }
 ): Promise<string> {
-  if (!isAIServiceAvailable()) {
+  if (!isUserAuthenticated()) {
     return generatePlaceholderSummary(stockName, valueScore)
   }
 
   try {
-    const aiService = getAIService()
-
     const request: StockAnalysisRequest = {
       stockCode,
       stockName,
@@ -82,9 +94,7 @@ export async function generateStockSummary(
       },
     }
 
-    // Use deep analysis for high-quality summaries (Claude by default)
-    const response = await aiService.analyzeStock(request, AnalysisType.DEEP)
-
+    const response = await aiApi.analyzeStock(request)
     return response.summary
   } catch (error) {
     console.error('Failed to generate stock summary:', error)
@@ -160,10 +170,7 @@ function generatePlaceholderAnalysis(stockDetail: StockDetail): AIAnalysis {
   // Stability
   if (financial_metrics.current.debt_ratio && financial_metrics.current.debt_ratio < 100) {
     strengths.push('안정적인 재무구조')
-  } else if (
-    financial_metrics.current.debt_ratio &&
-    financial_metrics.current.debt_ratio > 200
-  ) {
+  } else if (financial_metrics.current.debt_ratio && financial_metrics.current.debt_ratio > 200) {
     risks.push('높은 부채비율')
   }
 
@@ -210,8 +217,22 @@ function generatePlaceholderSummary(stockName: string, valueScore: number): stri
 }
 
 /**
- * Check if AI analysis is available
+ * Check if AI analysis is available (async)
  */
-export function isAIAnalysisAvailable(): boolean {
-  return isAIServiceAvailable()
+export async function isAIAnalysisAvailable(): Promise<boolean> {
+  return isAIAvailableForUser()
+}
+
+/**
+ * Synchronous check (uses cached value)
+ */
+export function isAIAnalysisAvailableSync(): boolean {
+  return isAIAvailableForUserSync()
+}
+
+/**
+ * Reset AI availability cache
+ */
+export function resetAIAvailabilityCache(): void {
+  resetCache()
 }

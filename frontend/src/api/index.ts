@@ -9,6 +9,7 @@ export { stocksApi } from './stocks'
 export { screenerApi } from './screener'
 export { watchlistApi } from './watchlist'
 export { chatApi } from './chat'
+export { aiApi } from './ai'
 export { default as apiClient } from './client'
 
 // Re-export types
