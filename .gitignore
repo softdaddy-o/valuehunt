@@ -75,3 +75,6 @@ backend/.pytest_cache/
 
 # OS
 Thumbs.db
+
+# Terraform sensitive outputs
+GCP_PROJECT_INFO.json

@@ -1,7 +1,7 @@
 /**
  * GitHub Secrets Module
  *
- * Syncs secrets from local .env to GitHub Actions
+ * Syncs secrets to GitHub Actions repository secrets.
  */
 
 terraform {
@@ -12,6 +12,10 @@ terraform {
     }
   }
 }
+
+# =============================================================================
+# Variables
+# =============================================================================
 
 variable "repository" {
   description = "GitHub repository name"
@@ -24,20 +28,24 @@ variable "secrets" {
   sensitive   = true
 }
 
-# Use nonsensitive() only for iteration keys, values remain protected
+# =============================================================================
+# Resources
+# =============================================================================
+
 resource "github_actions_secret" "secrets" {
-  for_each = {
-    for key, value in nonsensitive(var.secrets) :
-    key => value
-    if startswith(key, "VITE_")
-  }
+  for_each = nonsensitive(toset(keys(var.secrets)))
 
   repository      = var.repository
   secret_name     = each.key
-  plaintext_value = each.value
+  plaintext_value = var.secrets[each.key]
 }
+
+# =============================================================================
+# Outputs
+# =============================================================================
 
 output "secret_names" {
   description = "List of secret names created"
-  value       = keys(github_actions_secret.secrets)
+  value       = keys(var.secrets)
+  sensitive   = true
 }

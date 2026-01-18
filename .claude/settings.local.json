@@ -3,7 +3,18 @@
     "allow": [
       "Bash(node scripts/setup-terraform.js:*)",
       "Bash(npm run build:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(test:*)",
+      "Bash(copy:*)",
+      "Bash(find:*)",
+      "Bash(terraform init:*)",
+      "Bash(terraform plan:*)",
+      "Bash(terraform apply:*)",
+      "Bash(terraform output:*)",
+      "Bash(xargs:*)",
+      "Bash(terraform state show:*)",
+      "Bash(terraform fmt:*)",
+      "Bash(terraform validate:*)"
     ]
   }
 }
