@@ -14,7 +14,23 @@
       "Bash(xargs:*)",
       "Bash(terraform state show:*)",
       "Bash(terraform fmt:*)",
-      "Bash(terraform validate:*)"
+      "Bash(terraform validate:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(pip install:*)",
+      "Bash(pip show:*)",
+      "Bash(python -c:*)",
+      "Bash(DART_API_KEY=\"\" python -c \"from app.services.dart_service import dart_service; print\\(''Import successful''\\); print\\(f''Available: {dart_service.is_available\\(\\)}''\\)\")",
+      "Bash(ls:*)",
+      "Bash(docker-compose build:*)",
+      "Bash(docker info:*)",
+      "Bash(pip index:*)",
+      "Bash(test-docker.bat)",
+      "Bash(cmd.exe /c test-docker.bat)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker-compose down:*)",
+      "Bash(curl:*)"
     ]
   }
 }

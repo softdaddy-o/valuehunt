@@ -1,0 +1,151 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: valuehunt_db
+    environment:
+      POSTGRES_USER: valuehunt
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-valuehunt_dev}
+      POSTGRES_DB: valuehunt
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U valuehunt"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - valuehunt_network
+
+  # Redis Cache & Celery Broker
+  redis:
+    image: redis:7-alpine
+    container_name: valuehunt_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - valuehunt_network
+
+  # FastAPI Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: valuehunt_api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://valuehunt:${POSTGRES_PASSWORD:-valuehunt_dev}@db:5432/valuehunt
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DEBUG: ${DEBUG:-true}
+      DART_API_KEY: ${DART_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      SECRET_KEY: ${SECRET_KEY}
+    volumes:
+      - .:/app
+      - /app/__pycache__
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - valuehunt_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Celery Worker
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: valuehunt_celery_worker
+    command: celery -A app.celery_app worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql://valuehunt:${POSTGRES_PASSWORD:-valuehunt_dev}@db:5432/valuehunt
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DEBUG: ${DEBUG:-true}
+      DART_API_KEY: ${DART_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      SECRET_KEY: ${SECRET_KEY}
+    volumes:
+      - .:/app
+      - /app/__pycache__
+    depends_on:
+      - db
+      - redis
+      - api
+    networks:
+      - valuehunt_network
+
+  # Celery Beat Scheduler
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: valuehunt_celery_beat
+    command: celery -A app.celery_app beat --loglevel=info --scheduler redbeat.RedBeatScheduler
+    environment:
+      DATABASE_URL: postgresql://valuehunt:${POSTGRES_PASSWORD:-valuehunt_dev}@db:5432/valuehunt
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DEBUG: ${DEBUG:-true}
+      DART_API_KEY: ${DART_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      SECRET_KEY: ${SECRET_KEY}
+    volumes:
+      - .:/app
+      - /app/__pycache__
+    depends_on:
+      - db
+      - redis
+      - api
+    networks:
+      - valuehunt_network
+
+  # Optional: Flower (Celery monitoring)
+  flower:
+    image: mher/flower:2.0
+    container_name: valuehunt_flower
+    command: celery -A app.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    depends_on:
+      - redis
+      - celery_worker
+    networks:
+      - valuehunt_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  valuehunt_network:
+    driver: bridge

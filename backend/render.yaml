@@ -1,0 +1,170 @@
+# Render Blueprint for ValueHunt Backend
+# This file defines all infrastructure as code for deployment to Render.com
+# See: https://render.com/docs/blueprint-spec
+
+services:
+  # FastAPI Web Service
+  - type: web
+    name: valuehunt-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: oregon  # Change to your preferred region
+    plan: starter  # Can use 'free' for testing, 'starter' for production
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: valuehunt-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: valuehunt-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          name: valuehunt-redis
+          type: redis
+          envVarKey: REDIS_URL
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          name: valuehunt-redis
+          type: redis
+          envVarKey: REDIS_URL
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: SECRET_KEY
+        generateValue: true  # Render will generate a secure random value
+      - key: DART_API_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: GEMINI_API_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: OPENAI_API_KEY
+        sync: false  # Optional
+      - key: ANTHROPIC_API_KEY
+        sync: false  # Optional
+    healthCheckPath: /health
+    autoDeploy: true  # Auto-deploy on git push
+    buildFilter:
+      paths:
+        - backend/**
+    disk:
+      name: logs
+      mountPath: /app/logs
+      sizeGB: 1
+
+  # Celery Worker (Background Tasks)
+  - type: worker
+    name: valuehunt-celery-worker
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: celery -A app.celery_app worker --loglevel=info --concurrency=2
+    region: oregon
+    plan: starter
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: valuehunt-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: valuehunt-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          name: valuehunt-redis
+          type: redis
+          envVarKey: REDIS_URL
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          name: valuehunt-redis
+          type: redis
+          envVarKey: REDIS_URL
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: SECRET_KEY
+        fromService:
+          name: valuehunt-api
+          type: web
+          envVarKey: SECRET_KEY
+      - key: DART_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - backend/**
+
+  # Celery Beat (Scheduler) - SINGLETON
+  - type: worker
+    name: valuehunt-celery-beat
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: celery -A app.celery_app beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    region: oregon
+    plan: starter
+    numInstances: 1  # CRITICAL: Only ONE instance for beat scheduler
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: valuehunt-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: valuehunt-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          name: valuehunt-redis
+          type: redis
+          envVarKey: REDIS_URL
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          name: valuehunt-redis
+          type: redis
+          envVarKey: REDIS_URL
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: SECRET_KEY
+        fromService:
+          name: valuehunt-api
+          type: web
+          envVarKey: SECRET_KEY
+      - key: DART_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - backend/**
+
+databases:
+  # PostgreSQL Database
+  - name: valuehunt-db
+    databaseName: valuehunt
+    user: valuehunt
+    plan: starter  # Can use 'free' for testing (90 days), 'starter' for production
+    region: oregon
+    postgresMajorVersion: 15
+
+  # Redis Cache & Broker
+  - name: valuehunt-redis
+    plan: starter  # No free tier for Redis
+    region: oregon
+    maxmemoryPolicy: allkeys-lru  # Eviction policy when memory limit reached
+    ipAllowList: []  # Allow all IPs (Render services can connect)

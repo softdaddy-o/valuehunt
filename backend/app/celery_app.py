@@ -22,6 +22,9 @@ celery_app.conf.update(
     task_track_started=True,
     task_time_limit=30 * 60,  # 30 minutes
     task_soft_time_limit=25 * 60,  # 25 minutes
+    # RedBeat scheduler (Redis-backed, persistent across restarts)
+    redbeat_redis_url=settings.CELERY_BROKER_URL,
+    redbeat_key_prefix="valuehunt:redbeat:",
 )
 
 # Periodic tasks schedule
@@ -40,5 +43,15 @@ celery_app.conf.beat_schedule = {
     "calculate-value-scores-daily": {
         "task": "app.tasks.data_tasks.calculate_all_value_scores_task",
         "schedule": crontab(hour=19, minute=0, day_of_week="1-5"),
+    },
+    # Weekly DART financial data collection - Every Monday at 2 AM
+    "collect-dart-financial-data-weekly": {
+        "task": "app.tasks.dart_tasks.fetch_all_dart_financial_metrics_task",
+        "schedule": crontab(hour=2, minute=0, day_of_week=1),
+    },
+    # Monthly corp_code cache update - First day of month at 1 AM
+    "update-corp-code-cache-monthly": {
+        "task": "app.tasks.dart_tasks.update_corp_code_cache_task",
+        "schedule": crontab(hour=1, minute=0, day_of_month=1),
     },
 }

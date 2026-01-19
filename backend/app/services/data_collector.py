@@ -194,25 +194,23 @@ class DataCollector:
         logger.info(f"Price collection completed: {result}")
         return result
 
-    def calculate_financial_metrics(self, stock_code: str) -> bool:
+    def calculate_financial_metrics(self, stock_code: str, use_dart: bool = True) -> bool:
         """
         종목의 재무 지표 계산 및 저장
 
-        실제 재무제표 데이터는 DART API 또는 외부 데이터 소스 필요
-        현재는 더미 데이터로 대체 (TODO: DART API 통합)
+        DART API를 통해 실제 재무제표 데이터를 수집하고, 실패 시 더미 데이터로 대체
 
         Args:
             stock_code: 종목 코드
+            use_dart: DART API 사용 여부 (False 또는 API 실패 시 mock data 사용)
 
         Returns:
             성공 여부
         """
         try:
-            # TODO: DART API 또는 외부 데이터 소스에서 재무제표 데이터 수집
-            # 현재는 샘플 데이터 생성
-
             stock = self.db.query(Stock).filter(Stock.code == stock_code).first()
             if not stock:
+                logger.warning(f"Stock {stock_code} not found")
                 return False
 
             today = datetime.now().date()
@@ -227,31 +225,19 @@ class DataCollector:
                 logger.info(f"Financial metrics already exist for {stock_code}")
                 return True
 
-            # 더미 재무 지표 생성 (실제로는 DART API에서 가져와야 함)
-            import random
+            # DART API에서 데이터 수집 시도
+            dart_data = self._fetch_dart_data(stock_code) if use_dart else None
 
+            # DART 실패 시 더미 데이터로 대체
+            if dart_data is None:
+                logger.info(f"Using mock data for {stock_code}")
+                dart_data = self._generate_mock_metrics()
+
+            # FinancialMetrics 객체 생성
             metrics = FinancialMetrics(
                 stock_code=stock_code,
                 date=today,
-                # Valuation
-                per=round(random.uniform(5, 20), 2),
-                pbr=round(random.uniform(0.5, 3), 2),
-                psr=round(random.uniform(0.5, 5), 2),
-                ev_ebitda=round(random.uniform(5, 15), 2),
-                # Profitability
-                roe=round(random.uniform(5, 25), 2),
-                roa=round(random.uniform(3, 15), 2),
-                operating_margin=round(random.uniform(5, 20), 2),
-                net_profit_growth=round(random.uniform(-10, 30), 2),
-                # Stability
-                debt_ratio=round(random.uniform(20, 100), 2),
-                current_ratio=round(random.uniform(100, 300), 2),
-                interest_coverage=round(random.uniform(5, 20), 2),
-                operating_cashflow=random.randint(100000000, 1000000000),
-                # Dividend
-                dividend_yield=round(random.uniform(0, 5), 2),
-                dividend_payout_ratio=round(random.uniform(10, 50), 2),
-                consecutive_dividend_years=random.randint(0, 10),
+                **dart_data
             )
 
             self.db.add(metrics)
@@ -264,6 +250,47 @@ class DataCollector:
             logger.error(f"Error calculating metrics for {stock_code}: {e}")
             self.db.rollback()
             return False
+
+    def _fetch_dart_data(self, stock_code: str) -> Optional[Dict[str, Any]]:
+        """DART API에서 재무 데이터 수집 시도"""
+        from app.services.dart_service import dart_service
+
+        if not dart_service.is_available():
+            return None
+
+        try:
+            logger.info(f"Fetching DART data for {stock_code}...")
+            dart_data = dart_service.calculate_metrics_from_stock_code(stock_code)
+
+            if dart_data:
+                logger.info(f"Successfully fetched DART data for {stock_code}")
+
+            return dart_data
+        except Exception as e:
+            logger.warning(f"DART API failed for {stock_code}: {e}. Falling back to mock data.")
+            return None
+
+    def _generate_mock_metrics(self) -> Dict[str, Any]:
+        """더미 재무 지표 생성 (DART 실패 시 대체용)"""
+        import random
+
+        return {
+            "per": round(random.uniform(5, 20), 2),
+            "pbr": round(random.uniform(0.5, 3), 2),
+            "psr": round(random.uniform(0.5, 5), 2),
+            "ev_ebitda": round(random.uniform(5, 15), 2),
+            "roe": round(random.uniform(5, 25), 2),
+            "roa": round(random.uniform(3, 15), 2),
+            "operating_margin": round(random.uniform(5, 20), 2),
+            "net_profit_growth": round(random.uniform(-10, 30), 2),
+            "debt_ratio": round(random.uniform(20, 100), 2),
+            "current_ratio": round(random.uniform(100, 300), 2),
+            "interest_coverage": round(random.uniform(5, 20), 2),
+            "operating_cashflow": random.randint(100000000, 1000000000),
+            "dividend_yield": round(random.uniform(0, 5), 2),
+            "dividend_payout_ratio": round(random.uniform(10, 50), 2),
+            "consecutive_dividend_years": random.randint(0, 10),
+        }
 
     def collect_all_financial_metrics(self, limit: Optional[int] = None) -> Dict[str, Any]:
         """

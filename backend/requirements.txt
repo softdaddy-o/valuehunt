@@ -3,6 +3,7 @@ fastapi==0.109.0
 uvicorn[standard]==0.27.0
 pydantic==2.5.3
 pydantic-settings==2.1.0
+email-validator==2.1.0
 
 # Database
 sqlalchemy==2.0.25
@@ -25,7 +26,8 @@ anthropic==0.8.1
 google-generativeai>=0.5.0
 
 # Data Collection
-FinanceDataReader==0.9.50
+finance-datareader>=0.9.50
+OpenDartReader==0.2.1
 requests==2.31.0
 pandas==2.1.4
 numpy==1.26.3
@@ -54,5 +56,4 @@ flake8==7.0.0
 mypy==1.8.0
 pre-commit==3.6.0
 
-# CORS
-python-cors==1.0.0
+# CORS (built-in to FastAPI, no additional package needed)
