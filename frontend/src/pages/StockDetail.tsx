@@ -93,11 +93,11 @@ export function StockDetail() {
               {stock_info.change_rate !== null && (
                 <div
                   className={`text-lg font-medium ${
-                    stock_info.change_rate >= 0 ? 'text-red-500' : 'text-blue-500'
+                    Number(stock_info.change_rate) >= 0 ? 'text-red-500' : 'text-blue-500'
                   }`}
                 >
-                  {stock_info.change_rate >= 0 ? '+' : ''}
-                  {stock_info.change_rate.toFixed(2)}%
+                  {Number(stock_info.change_rate) >= 0 ? '+' : ''}
+                  {Number(stock_info.change_rate).toFixed(2)}%
                 </div>
               )}
             </div>
@@ -123,7 +123,7 @@ export function StockDetail() {
                 ]}
                 title="최근 6개월 주가 추이"
                 height={250}
-                color={stock_info.change_rate >= 0 ? '#ef4444' : '#3b82f6'}
+                color={Number(stock_info.change_rate) >= 0 ? '#ef4444' : '#3b82f6'}
               />
             </Card>
 
@@ -284,8 +284,9 @@ export function StockDetail() {
   )
 }
 
-function ScoreBox({ label, term, score, max }: { label: string; term: string; score: number; max: number }) {
-  const percentage = (score / max) * 100
+function ScoreBox({ label, term, score, max }: { label: string; term: string; score: number | string; max: number }) {
+  const numScore = Number(score)
+  const percentage = (numScore / max) * 100
   const getColor = () => {
     if (percentage >= 80) return 'bg-green-500'
     if (percentage >= 60) return 'bg-blue-500'
@@ -296,7 +297,7 @@ function ScoreBox({ label, term, score, max }: { label: string; term: string; sc
   return (
     <div className="text-center">
       <div className="mb-2">
-        <div className="text-2xl font-bold text-gray-900">{score.toFixed(1)}</div>
+        <div className="text-2xl font-bold text-gray-900">{numScore.toFixed(1)}</div>
         <div className="text-xs text-gray-500">/ {max}</div>
       </div>
       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -320,7 +321,7 @@ function MetricBox({
 }: {
   label: string
   term: string
-  value: number | null
+  value: number | string | null
   suffix?: string
 }) {
   return (
@@ -329,7 +330,7 @@ function MetricBox({
         <div className="text-xs text-gray-500 mb-1 border-b border-dotted border-gray-400 inline-block">{label}</div>
       </TermTooltip>
       <div className="text-lg font-bold text-gray-900">
-        {value !== null ? `${value.toFixed(2)}${suffix}` : 'N/A'}
+        {value !== null ? `${Number(value).toFixed(2)}${suffix}` : 'N/A'}
       </div>
     </div>
   )

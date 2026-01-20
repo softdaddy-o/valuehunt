@@ -298,17 +298,17 @@ export function Screener() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                {stock.value_score.toFixed(1)}
+                                {Number(stock.value_score).toFixed(1)}
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {stock.PER?.toFixed(2) || 'N/A'}
+                              {stock.PER ? Number(stock.PER).toFixed(2) : 'N/A'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {stock.PBR?.toFixed(2) || 'N/A'}
+                              {stock.PBR ? Number(stock.PBR).toFixed(2) : 'N/A'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {stock.ROE?.toFixed(2)}%
+                              {stock.ROE ? `${Number(stock.ROE).toFixed(2)}%` : 'N/A'}
                             </td>
                           </tr>
                         ))}

@@ -161,23 +161,26 @@ function generatePlaceholderAnalysis(stockDetail: StockDetail): AIAnalysis {
   }
 
   // Profitability
-  if (financial_metrics.current.ROE && financial_metrics.current.ROE > 15) {
-    strengths.push(`우수한 자기자본이익률 (ROE ${financial_metrics.current.ROE.toFixed(1)}%)`)
-  } else if (financial_metrics.current.ROE && financial_metrics.current.ROE < 5) {
+  const roe = Number(financial_metrics.current.ROE)
+  if (financial_metrics.current.ROE && roe > 15) {
+    strengths.push(`우수한 자기자본이익률 (ROE ${roe.toFixed(1)}%)`)
+  } else if (financial_metrics.current.ROE && roe < 5) {
     risks.push('낮은 수익성')
   }
 
   // Stability
-  if (financial_metrics.current.debt_ratio && financial_metrics.current.debt_ratio < 100) {
+  const debtRatio = Number(financial_metrics.current.debt_ratio)
+  if (financial_metrics.current.debt_ratio && debtRatio < 100) {
     strengths.push('안정적인 재무구조')
-  } else if (financial_metrics.current.debt_ratio && financial_metrics.current.debt_ratio > 200) {
+  } else if (financial_metrics.current.debt_ratio && debtRatio > 200) {
     risks.push('높은 부채비율')
   }
 
   // Dividend
-  if (financial_metrics.current.dividend_yield && financial_metrics.current.dividend_yield > 3) {
+  const dividendYield = Number(financial_metrics.current.dividend_yield)
+  if (financial_metrics.current.dividend_yield && dividendYield > 3) {
     strengths.push(
-      `매력적인 배당수익률 (${financial_metrics.current.dividend_yield.toFixed(1)}%)`
+      `매력적인 배당수익률 (${dividendYield.toFixed(1)}%)`
     )
   }
 
@@ -189,12 +192,13 @@ function generatePlaceholderAnalysis(stockDetail: StockDetail): AIAnalysis {
     risks.push('리스크 평가 진행 중')
   }
 
+  const totalScore = Number(value_score.total)
   const summary =
-    value_score.total >= 70
-      ? `${stock_info.name}은 Value Score ${value_score.total.toFixed(1)}점으로 우량 저평가주로 평가됩니다. ${stock_info.sector || '해당 업종'}에서 안정적인 실적을 보이고 있습니다.`
-      : value_score.total >= 50
-        ? `${stock_info.name}은 Value Score ${value_score.total.toFixed(1)}점으로 관심 종목입니다. 재무 지표를 고려한 투자 검토가 필요합니다.`
-        : `${stock_info.name}은 Value Score ${value_score.total.toFixed(1)}점입니다. 투자 시 신중한 접근이 필요합니다.`
+    totalScore >= 70
+      ? `${stock_info.name}은 Value Score ${totalScore.toFixed(1)}점으로 우량 저평가주로 평가됩니다. ${stock_info.sector || '해당 업종'}에서 안정적인 실적을 보이고 있습니다.`
+      : totalScore >= 50
+        ? `${stock_info.name}은 Value Score ${totalScore.toFixed(1)}점으로 관심 종목입니다. 재무 지표를 고려한 투자 검토가 필요합니다.`
+        : `${stock_info.name}은 Value Score ${totalScore.toFixed(1)}점입니다. 투자 시 신중한 접근이 필요합니다.`
 
   return {
     summary,
@@ -206,13 +210,14 @@ function generatePlaceholderAnalysis(stockDetail: StockDetail): AIAnalysis {
 /**
  * Generate placeholder summary when AI is not available
  */
-function generatePlaceholderSummary(stockName: string, valueScore: number): string {
-  if (valueScore >= 70) {
-    return `${stockName}은 Value Score ${valueScore.toFixed(1)}점으로 우량 저평가주로 평가됩니다.`
-  } else if (valueScore >= 50) {
-    return `${stockName}은 Value Score ${valueScore.toFixed(1)}점으로 관심 종목입니다.`
+function generatePlaceholderSummary(stockName: string, valueScore: number | string): string {
+  const score = Number(valueScore)
+  if (score >= 70) {
+    return `${stockName}은 Value Score ${score.toFixed(1)}점으로 우량 저평가주로 평가됩니다.`
+  } else if (score >= 50) {
+    return `${stockName}은 Value Score ${score.toFixed(1)}점으로 관심 종목입니다.`
   } else {
-    return `${stockName}은 Value Score ${valueScore.toFixed(1)}점입니다. 신중한 검토가 필요합니다.`
+    return `${stockName}은 Value Score ${score.toFixed(1)}점입니다. 신중한 검토가 필요합니다.`
   }
 }
 

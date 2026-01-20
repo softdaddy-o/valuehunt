@@ -129,13 +129,13 @@ export function Watchlist() {
                     </div>
                     <div
                       className={`text-sm ${
-                        item.change_rate >= 0
+                        Number(item.change_rate) >= 0
                           ? 'text-red-600'
                           : 'text-blue-600'
                       }`}
                     >
-                      {item.change_rate >= 0 ? '▲' : '▼'}{' '}
-                      {Math.abs(item.change_rate).toFixed(2)}%
+                      {Number(item.change_rate) >= 0 ? '▲' : '▼'}{' '}
+                      {Math.abs(Number(item.change_rate)).toFixed(2)}%
                     </div>
                   </div>
 
@@ -146,14 +146,14 @@ export function Watchlist() {
                       </div>
                       <div
                         className={`text-xl font-bold ${
-                          item.value_score >= 70
+                          Number(item.value_score) >= 70
                             ? 'text-green-600'
-                            : item.value_score >= 50
+                            : Number(item.value_score) >= 50
                             ? 'text-yellow-600'
                             : 'text-gray-600'
                         }`}
                       >
-                        {item.value_score.toFixed(1)}
+                        {Number(item.value_score).toFixed(1)}
                       </div>
                     </div>
                   )}
