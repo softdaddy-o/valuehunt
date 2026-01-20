@@ -1,6 +1,7 @@
 import { TopPickItem } from '@/types/api'
 import { Card } from '@/components/ui/Card'
 import { useNavigate } from 'react-router-dom'
+import { formatPrice } from '@/utils/styles'
 
 interface StockCardProps {
   stock: TopPickItem
@@ -70,7 +71,7 @@ export function StockCard({ stock }: StockCardProps): JSX.Element {
         {/* Price Info */}
         <div className="flex items-baseline gap-2">
           <span className="text-2xl font-bold text-gray-900">
-            {stock.current_price?.toLocaleString()}
+            {formatPrice(stock.current_price)}
             <span className="text-sm font-normal text-gray-500">원</span>
           </span>
           {changeRate !== null && (

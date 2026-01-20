@@ -48,6 +48,7 @@ def get_top_picks(
             )
         )
         .filter(ValueScore.date == latest_date[0])
+        .filter(Stock.current_price.isnot(None))
     )
 
     # Filter by market

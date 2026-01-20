@@ -4,6 +4,7 @@ import { watchlistApi } from '@/api'
 import { WatchlistItem as WatchlistItemType } from '@/types/api'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { formatPrice } from '@/utils/styles'
 
 export function Watchlist() {
   const navigate = useNavigate()
@@ -124,7 +125,7 @@ export function Watchlist() {
                 <div className="flex items-center gap-6">
                   <div>
                     <div className="text-2xl font-bold text-gray-900">
-                      {item.current_price.toLocaleString()}원
+                      {formatPrice(item.current_price)}원
                     </div>
                     <div
                       className={`text-sm ${

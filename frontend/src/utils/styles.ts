@@ -13,3 +13,26 @@ export const LEVEL_COLORS: Record<LevelType, string> = {
   medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
   high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
 }
+
+/**
+ * Formats a price value with locale-specific thousands separators.
+ * Returns a fallback string for null/undefined values.
+ */
+export function formatPrice(
+  value: number | null | undefined,
+  fallback: string = '-'
+): string {
+  return value?.toLocaleString() ?? fallback
+}
+
+/**
+ * Formats a numeric value with a fixed number of decimal places.
+ * Returns a fallback string for null/undefined values.
+ */
+export function formatNumber(
+  value: number | null | undefined,
+  decimals: number = 2,
+  fallback: string = 'N/A'
+): string {
+  return value?.toFixed(decimals) ?? fallback
+}

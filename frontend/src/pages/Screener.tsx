@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useNavigate } from 'react-router-dom'
+import { formatPrice } from '@/utils/styles'
 
 export function Screener() {
   const navigate = useNavigate()
@@ -293,7 +294,7 @@ export function Screener() {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {stock.current_price?.toLocaleString()}원
+                              {formatPrice(stock.current_price)}원
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
