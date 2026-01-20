@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { stocksApi, StockDetail as StockDetailType } from '@/api'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { TermTooltip } from '@/components/ui/TermTooltip'
 import { StockChart } from '@/components/StockChart'
 
 export function StockDetail() {
@@ -129,14 +130,16 @@ export function StockDetail() {
             {/* Value Score */}
             <Card>
               <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Value Score
+                <TermTooltip term="Value Score">
+                  <span className="border-b border-dotted border-gray-400">Value Score</span>
+                </TermTooltip>
               </h2>
               <div className="grid grid-cols-5 gap-4">
-                <ScoreBox label="총점" score={value_score.total} max={100} />
-                <ScoreBox label="밸류에이션" score={value_score.valuation} max={40} />
-                <ScoreBox label="수익성" score={value_score.profitability} max={30} />
-                <ScoreBox label="안정성" score={value_score.stability} max={20} />
-                <ScoreBox label="배당" score={value_score.dividend} max={10} />
+                <ScoreBox label="총점" term="총점" score={value_score.total} max={100} />
+                <ScoreBox label="밸류에이션" term="밸류에이션" score={value_score.valuation} max={40} />
+                <ScoreBox label="수익성" term="수익성" score={value_score.profitability} max={30} />
+                <ScoreBox label="안정성" term="안정성" score={value_score.stability} max={20} />
+                <ScoreBox label="배당" term="배당" score={value_score.dividend} max={10} />
               </div>
             </Card>
 
@@ -190,33 +193,40 @@ export function StockDetail() {
               <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
                 <MetricBox
                   label="PER"
+                  term="PER"
                   value={financial_metrics.current.PER}
                 />
                 <MetricBox
                   label="PBR"
+                  term="PBR"
                   value={financial_metrics.current.PBR}
                 />
                 <MetricBox
                   label="ROE"
+                  term="ROE"
                   value={financial_metrics.current.ROE}
                   suffix="%"
                 />
                 <MetricBox
                   label="ROA"
+                  term="ROA"
                   value={financial_metrics.current.ROA}
                   suffix="%"
                 />
                 <MetricBox
                   label="부채비율"
+                  term="부채비율"
                   value={financial_metrics.current.debt_ratio}
                   suffix="%"
                 />
                 <MetricBox
                   label="유동비율"
+                  term="유동비율"
                   value={financial_metrics.current.current_ratio}
                 />
                 <MetricBox
                   label="배당수익률"
+                  term="배당수익률"
                   value={financial_metrics.current.dividend_yield}
                   suffix="%"
                 />
@@ -235,6 +245,7 @@ export function StockDetail() {
                 <InfoRow label="업종" value={stock_info.sector || 'N/A'} />
                 <InfoRow
                   label="시가총액"
+                  term="시가총액"
                   value={
                     stock_info.market_cap
                       ? `${(stock_info.market_cap / 100000000).toFixed(0)}억원`
@@ -273,7 +284,7 @@ export function StockDetail() {
   )
 }
 
-function ScoreBox({ label, score, max }: { label: string; score: number; max: number }) {
+function ScoreBox({ label, term, score, max }: { label: string; term: string; score: number; max: number }) {
   const percentage = (score / max) * 100
   const getColor = () => {
     if (percentage >= 80) return 'bg-green-500'
@@ -294,23 +305,29 @@ function ScoreBox({ label, score, max }: { label: string; score: number; max: nu
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <div className="mt-2 text-xs text-gray-600">{label}</div>
+      <TermTooltip term={term} position="bottom">
+        <div className="mt-2 text-xs text-gray-600 border-b border-dotted border-gray-400 inline-block">{label}</div>
+      </TermTooltip>
     </div>
   )
 }
 
 function MetricBox({
   label,
+  term,
   value,
   suffix = '',
 }: {
   label: string
+  term: string
   value: number | null
   suffix?: string
 }) {
   return (
     <div className="p-3 bg-gray-50 rounded-lg">
-      <div className="text-xs text-gray-500 mb-1">{label}</div>
+      <TermTooltip term={term} position="top">
+        <div className="text-xs text-gray-500 mb-1 border-b border-dotted border-gray-400 inline-block">{label}</div>
+      </TermTooltip>
       <div className="text-lg font-bold text-gray-900">
         {value !== null ? `${value.toFixed(2)}${suffix}` : 'N/A'}
       </div>
@@ -318,10 +335,16 @@ function MetricBox({
   )
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function InfoRow({ label, term, value }: { label: string; term?: string; value: string }) {
   return (
     <div className="flex justify-between">
-      <span className="text-gray-500">{label}</span>
+      {term ? (
+        <TermTooltip term={term} position="right">
+          <span className="text-gray-500 border-b border-dotted border-gray-400">{label}</span>
+        </TermTooltip>
+      ) : (
+        <span className="text-gray-500">{label}</span>
+      )}
       <span className="font-medium text-gray-900">{value}</span>
     </div>
   )

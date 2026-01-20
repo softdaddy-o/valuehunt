@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { TrendingUp, TrendingDown, Minus, ArrowUpRight, Sparkles } from 'lucide-react'
 
 import { Card } from '@/components/ui/Card'
+import { TermTooltip } from '@/components/ui/TermTooltip'
 import { TopPickItem } from '@/types/api'
 import { formatPrice } from '@/utils/styles'
 
@@ -96,18 +97,18 @@ export function StockCard({ stock }: StockCardProps): JSX.Element {
             카테고리 점수
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <CategoryScoreBar label="밸류" score={stock.category_scores.valuation} max={40} />
-            <CategoryScoreBar label="수익성" score={stock.category_scores.profitability} max={30} />
-            <CategoryScoreBar label="안정성" score={stock.category_scores.stability} max={20} />
-            <CategoryScoreBar label="배당" score={stock.category_scores.dividend} max={10} />
+            <CategoryScoreBar label="밸류" term="밸류" score={stock.category_scores.valuation} max={40} />
+            <CategoryScoreBar label="수익성" term="수익성" score={stock.category_scores.profitability} max={30} />
+            <CategoryScoreBar label="안정성" term="안정성" score={stock.category_scores.stability} max={20} />
+            <CategoryScoreBar label="배당" term="배당" score={stock.category_scores.dividend} max={10} />
           </div>
         </div>
 
         {/* Key Metrics */}
         <div className="grid grid-cols-3 gap-2 py-3 border-t border-gray-100">
-          <MetricPill label="PER" value={stock.key_metrics.PER} />
-          <MetricPill label="PBR" value={stock.key_metrics.PBR} />
-          <MetricPill label="ROE" value={stock.key_metrics.ROE} suffix="%" />
+          <MetricPill label="PER" term="PER" value={stock.key_metrics.PER} />
+          <MetricPill label="PBR" term="PBR" value={stock.key_metrics.PBR} />
+          <MetricPill label="ROE" term="ROE" value={stock.key_metrics.ROE} suffix="%" />
         </div>
 
         {/* AI Summary */}
@@ -195,6 +196,7 @@ function ValueScoreBadge({ score, size = 'md', className }: ValueScoreBadgeProps
 
 interface CategoryScoreBarProps {
   label: string
+  term: string
   score: number | string
   max: number
 }
@@ -206,14 +208,16 @@ function getProgressBarColor(percentage: number): string {
   return 'bg-gray-400'
 }
 
-function CategoryScoreBar({ label, score, max }: CategoryScoreBarProps): JSX.Element {
+function CategoryScoreBar({ label, term, score, max }: CategoryScoreBarProps): JSX.Element {
   const numScore = toNumber(score)
   const percentage = numScore !== null ? (numScore / max) * 100 : 0
 
   return (
     <div className="space-y-1">
       <div className="flex justify-between items-center text-xs">
-        <span className="text-gray-600">{label}</span>
+        <TermTooltip term={term} position="top">
+          <span className="text-gray-600 border-b border-dotted border-gray-400">{label}</span>
+        </TermTooltip>
         <span className="font-semibold text-gray-900">
           {numScore !== null ? numScore.toFixed(0) : 'N/A'}/{max}
         </span>
@@ -233,15 +237,18 @@ function CategoryScoreBar({ label, score, max }: CategoryScoreBarProps): JSX.Ele
 
 interface MetricItemProps {
   label: string
+  term: string
   value: number | string | null
   suffix?: string
 }
 
-function MetricPill({ label, value, suffix = '' }: MetricItemProps): JSX.Element {
+function MetricPill({ label, term, value, suffix = '' }: MetricItemProps): JSX.Element {
   const numValue = toNumber(value)
   return (
     <div className="flex flex-col items-center p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-      <span className="text-xs text-gray-500 mb-0.5">{label}</span>
+      <TermTooltip term={term} position="top">
+        <span className="text-xs text-gray-500 mb-0.5 border-b border-dotted border-gray-400">{label}</span>
+      </TermTooltip>
       <span className="font-bold text-gray-900 text-sm">
         {numValue !== null ? `${numValue.toFixed(2)}${suffix}` : 'N/A'}
       </span>
