@@ -39,7 +39,7 @@ def upgrade() -> None:
         'stocks',
         sa.Column('code', sa.String(length=10), nullable=False),
         sa.Column('name', sa.String(length=100), nullable=False),
-        sa.Column('market', sa.String(length=10), nullable=False),
+        sa.Column('market', sa.String(length=20), nullable=False),
         sa.Column('sector', sa.String(length=50), nullable=True),
         sa.Column('market_cap', sa.BigInteger(), nullable=True),
         sa.Column('current_price', sa.Integer(), nullable=True),

@@ -6,19 +6,34 @@ interface StockCardProps {
   stock: TopPickItem
 }
 
-export function StockCard({ stock }: StockCardProps) {
+// Helper to safely convert string or number to number with validation
+function toNumber(value: string | number | null | undefined): number | null {
+  if (value === null || value === undefined) return null
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null
+  }
+  const parsed = parseFloat(value)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+export function StockCard({ stock }: StockCardProps): JSX.Element {
   const navigate = useNavigate()
 
-  const handleClick = () => {
+  // Pre-compute numeric values to avoid repeated conversions
+  const changeRate = toNumber(stock.change_rate)
+  const valueScore = toNumber(stock.value_score)
+
+  function handleClick(): void {
     navigate(`/stocks/${stock.stock_code}`)
   }
 
-  const getPriceColor = (changeRate: number | null) => {
-    if (!changeRate) return 'text-gray-600'
-    return changeRate >= 0 ? 'text-red-500' : 'text-blue-500'
+  function getPriceColor(rate: number | null): string {
+    if (rate === null || rate === 0) return 'text-gray-600'
+    return rate >= 0 ? 'text-red-500' : 'text-blue-500'
   }
 
-  const getScoreColor = (score: number) => {
+  function getScoreColor(score: number | null): string {
+    if (score === null) return 'bg-gray-100 text-gray-800'
     if (score >= 80) return 'bg-green-100 text-green-800'
     if (score >= 60) return 'bg-blue-100 text-blue-800'
     if (score >= 40) return 'bg-yellow-100 text-yellow-800'
@@ -46,11 +61,9 @@ export function StockCard({ stock }: StockCardProps) {
             </div>
           </div>
           <div
-            className={`px-3 py-1 rounded-full text-sm font-bold ${getScoreColor(
-              stock.value_score
-            )}`}
+            className={`px-3 py-1 rounded-full text-sm font-bold ${getScoreColor(valueScore)}`}
           >
-            {stock.value_score.toFixed(1)}
+            {valueScore !== null ? valueScore.toFixed(1) : 'N/A'}
           </div>
         </div>
 
@@ -60,14 +73,10 @@ export function StockCard({ stock }: StockCardProps) {
             {stock.current_price?.toLocaleString()}
             <span className="text-sm font-normal text-gray-500">원</span>
           </span>
-          {stock.change_rate !== null && (
-            <span
-              className={`text-sm font-medium ${getPriceColor(
-                stock.change_rate
-              )}`}
-            >
-              {stock.change_rate >= 0 ? '+' : ''}
-              {stock.change_rate.toFixed(2)}%
+          {changeRate !== null && (
+            <span className={`text-sm font-medium ${getPriceColor(changeRate)}`}>
+              {changeRate >= 0 ? '+' : ''}
+              {changeRate.toFixed(2)}%
             </span>
           )}
           {stock.upside_potential && (
@@ -115,29 +124,36 @@ export function StockCard({ stock }: StockCardProps) {
   )
 }
 
-function ScoreBadge({ label, score }: { label: string; score: number }) {
+interface ScoreBadgeProps {
+  label: string
+  score: number | string
+}
+
+function ScoreBadge({ label, score }: ScoreBadgeProps): JSX.Element {
+  const numScore = toNumber(score)
   return (
     <div className="flex flex-col items-center p-2 bg-gray-50 rounded">
       <span className="text-xs text-gray-500">{label}</span>
-      <span className="text-sm font-bold text-gray-900">{score.toFixed(0)}</span>
+      <span className="text-sm font-bold text-gray-900">
+        {numScore !== null ? numScore.toFixed(0) : 'N/A'}
+      </span>
     </div>
   )
 }
 
-function MetricItem({
-  label,
-  value,
-  suffix = '',
-}: {
+interface MetricItemProps {
   label: string
-  value: number | null
+  value: number | string | null
   suffix?: string
-}) {
+}
+
+function MetricItem({ label, value, suffix = '' }: MetricItemProps): JSX.Element {
+  const numValue = toNumber(value)
   return (
     <div className="flex flex-col">
       <span className="text-xs text-gray-500">{label}</span>
       <span className="font-semibold text-gray-900">
-        {value !== null ? `${value.toFixed(2)}${suffix}` : 'N/A'}
+        {numValue !== null ? `${numValue.toFixed(2)}${suffix}` : 'N/A'}
       </span>
     </div>
   )

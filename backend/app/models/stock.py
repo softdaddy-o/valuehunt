@@ -14,7 +14,7 @@ class Stock(Base, TimestampMixin):
 
     code = Column(String(10), primary_key=True)
     name = Column(String(100), nullable=False)
-    market = Column(String(10), nullable=False, index=True)  # KOSPI, KOSDAQ
+    market = Column(String(20), nullable=False, index=True)  # KOSPI, KOSDAQ
     sector = Column(String(50), index=True)
     market_cap = Column(BigInteger, index=True)  # Market capitalization
     current_price = Column(Integer)  # Current stock price

@@ -10,7 +10,7 @@ class StockBase(BaseModel):
     """Base stock schema"""
     code: str = Field(..., max_length=10)
     name: str = Field(..., max_length=100)
-    market: str = Field(..., max_length=10, description="KOSPI or KOSDAQ")
+    market: str = Field(..., max_length=20, description="KOSPI or KOSDAQ")
     sector: Optional[str] = Field(None, max_length=50)
 
 
