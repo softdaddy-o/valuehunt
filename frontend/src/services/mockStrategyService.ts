@@ -187,6 +187,336 @@ const mockDividendStocks: StockRecommendation[] = [
   },
 ]
 
+/**
+ * Mock data for Strategy #5: Insider Trading
+ */
+const mockInsiderTradingStocks: StockRecommendation[] = [
+  {
+    stockCode: '005380',
+    stockName: '현대차',
+    market: 'KOSPI',
+    sector: '자동차',
+    rationale:
+      '정의선 회장 및 임원진의 지속적 자사주 매수. 전기차 전환 자신감의 표현으로 해석',
+    metrics: {
+      PER: 5.5,
+      PBR: 0.5,
+      ROE: 10.5,
+      debtRatio: 65.0,
+      profitGrowth: 18.0,
+      revenueGrowth: null,
+      dividendYield: 3.8,
+    },
+    upsidePotential: '+35%',
+    riskLevel: 'low',
+    confidenceScore: 85,
+  },
+  {
+    stockCode: '003550',
+    stockName: 'LG',
+    market: 'KOSPI',
+    sector: '지주회사',
+    rationale:
+      'LG그룹 지주사 임원들의 꾸준한 자사주 매수. 그룹 계열사 실적 개선 기대감 반영',
+    metrics: {
+      PER: 8.2,
+      PBR: 0.7,
+      ROE: 8.0,
+      debtRatio: 30.0,
+      profitGrowth: 12.0,
+      revenueGrowth: null,
+      dividendYield: 2.5,
+    },
+    upsidePotential: '+25%',
+    riskLevel: 'low',
+    confidenceScore: 80,
+  },
+  {
+    stockCode: '051910',
+    stockName: 'LG화학',
+    market: 'KOSPI',
+    sector: '화학',
+    rationale:
+      '2차전지 사업부 분사 이후에도 경영진 매수 지속. 석유화학 업황 회복 기대',
+    metrics: {
+      PER: 18.5,
+      PBR: 1.2,
+      ROE: 6.5,
+      debtRatio: 55.0,
+      profitGrowth: null,
+      revenueGrowth: 8.0,
+      dividendYield: 1.5,
+    },
+    upsidePotential: '+30%',
+    riskLevel: 'medium',
+    confidenceScore: 75,
+  },
+]
+
+/**
+ * Mock data for Strategy #6: Theme vs Real
+ */
+const mockThemeVsRealStocks: StockRecommendation[] = [
+  {
+    stockCode: '373220',
+    stockName: 'LG에너지솔루션',
+    market: 'KOSPI',
+    sector: '2차전지',
+    rationale:
+      '글로벌 배터리 점유율 2위. 북미 IRA 수혜로 수주 잔고 200조원 돌파. 테마가 아닌 실적주',
+    metrics: {
+      PER: 45.0,
+      PBR: 4.5,
+      ROE: 10.0,
+      debtRatio: 40.0,
+      profitGrowth: null,
+      revenueGrowth: 35.0,
+      dividendYield: null,
+    },
+    upsidePotential: '+40%',
+    riskLevel: 'medium',
+    confidenceScore: 80,
+  },
+  {
+    stockCode: '006400',
+    stockName: '삼성SDI',
+    market: 'KOSPI',
+    sector: '2차전지',
+    rationale:
+      '전고체 배터리 기술 선도. BMW, 리비안 등 프리미엄 고객사 확보. 매출의 80%가 배터리',
+    metrics: {
+      PER: 25.0,
+      PBR: 2.0,
+      ROE: 8.5,
+      debtRatio: 35.0,
+      profitGrowth: 15.0,
+      revenueGrowth: 20.0,
+      dividendYield: 0.8,
+    },
+    upsidePotential: '+35%',
+    riskLevel: 'medium',
+    confidenceScore: 78,
+  },
+  {
+    stockCode: '042700',
+    stockName: '한미반도체',
+    market: 'KOSDAQ',
+    sector: '반도체장비',
+    rationale:
+      'HBM 본딩 장비 글로벌 1위. SK하이닉스, 마이크론 공급. AI 반도체 수혜 실적으로 증명',
+    metrics: {
+      PER: 35.0,
+      PBR: 8.0,
+      ROE: 25.0,
+      debtRatio: 15.0,
+      profitGrowth: 50.0,
+      revenueGrowth: 45.0,
+      dividendYield: 0.5,
+    },
+    upsidePotential: '+50%',
+    riskLevel: 'high',
+    confidenceScore: 75,
+  },
+]
+
+/**
+ * Mock data for Strategy #7: Sector Rotation
+ */
+const mockSectorRotationStocks: StockRecommendation[] = [
+  {
+    stockCode: '086790',
+    stockName: '하나금융지주',
+    market: 'KOSPI',
+    sector: '은행',
+    rationale:
+      '금리 인하 사이클 진입 전 마지막 고금리 수혜. NIM 방어력 우수하며 밸류업 수혜 기대',
+    metrics: {
+      PER: 4.5,
+      PBR: 0.4,
+      ROE: 9.0,
+      debtRatio: null,
+      profitGrowth: 8.0,
+      revenueGrowth: null,
+      dividendYield: 6.0,
+    },
+    upsidePotential: '+25%',
+    riskLevel: 'low',
+    confidenceScore: 82,
+  },
+  {
+    stockCode: '035250',
+    stockName: '강원랜드',
+    market: 'KOSPI',
+    sector: '레저',
+    rationale:
+      '내수 소비 회복 수혜. 카지노 독점권 보유. 경기 회복기 레저 소비 증가 전망',
+    metrics: {
+      PER: 12.0,
+      PBR: 0.9,
+      ROE: 7.5,
+      debtRatio: 20.0,
+      profitGrowth: 15.0,
+      revenueGrowth: 12.0,
+      dividendYield: 4.0,
+    },
+    upsidePotential: '+30%',
+    riskLevel: 'medium',
+    confidenceScore: 70,
+  },
+  {
+    stockCode: '028260',
+    stockName: '삼성물산',
+    market: 'KOSPI',
+    sector: '건설',
+    rationale:
+      '금리 인하 시 건설/부동산 섹터 수혜. 삼성그룹 지배구조 핵심. 리조트/패션 사업 안정적',
+    metrics: {
+      PER: 15.0,
+      PBR: 0.8,
+      ROE: 5.5,
+      debtRatio: 45.0,
+      profitGrowth: null,
+      revenueGrowth: 5.0,
+      dividendYield: 1.8,
+    },
+    upsidePotential: '+20%',
+    riskLevel: 'low',
+    confidenceScore: 75,
+  },
+]
+
+/**
+ * Mock data for Strategy #8: Hidden Growth
+ */
+const mockHiddenGrowthStocks: StockRecommendation[] = [
+  {
+    stockCode: '403870',
+    stockName: 'HPSP',
+    market: 'KOSDAQ',
+    sector: '반도체장비',
+    rationale:
+      '고압 수소 어닐링 장비 세계 1위. 삼성전자, TSMC 공급. 시총 4000억대지만 매출 50% 성장',
+    metrics: {
+      PER: 25.0,
+      PBR: 5.0,
+      ROE: 22.0,
+      debtRatio: 10.0,
+      profitGrowth: 60.0,
+      revenueGrowth: 50.0,
+      dividendYield: null,
+    },
+    upsidePotential: '+70%',
+    riskLevel: 'high',
+    confidenceScore: 65,
+  },
+  {
+    stockCode: '950140',
+    stockName: '잉글우드랩',
+    market: 'KOSDAQ',
+    sector: '화장품ODM',
+    rationale:
+      '글로벌 인디 브랜드향 ODM 전문. 북미/유럽 수출 급증. 시총 3000억대 성장주',
+    metrics: {
+      PER: 18.0,
+      PBR: 3.5,
+      ROE: 20.0,
+      debtRatio: 25.0,
+      profitGrowth: 40.0,
+      revenueGrowth: 35.0,
+      dividendYield: 1.0,
+    },
+    upsidePotential: '+55%',
+    riskLevel: 'high',
+    confidenceScore: 68,
+  },
+  {
+    stockCode: '263750',
+    stockName: '펄어비스',
+    market: 'KOSDAQ',
+    sector: '게임',
+    rationale:
+      '검은사막 글로벌 성공. 신작 붉은사막 기대감. 시총 2조원대지만 신작 모멘텀 보유',
+    metrics: {
+      PER: 22.0,
+      PBR: 2.8,
+      ROE: 12.0,
+      debtRatio: 5.0,
+      profitGrowth: null,
+      revenueGrowth: 15.0,
+      dividendYield: null,
+    },
+    upsidePotential: '+45%',
+    riskLevel: 'high',
+    confidenceScore: 60,
+  },
+]
+
+/**
+ * Mock data for Strategy #9: Portfolio Designer
+ */
+const mockPortfolioDesignerStocks: StockRecommendation[] = [
+  {
+    stockCode: '005930',
+    stockName: '삼성전자',
+    market: 'KOSPI',
+    sector: '전기전자',
+    rationale:
+      '포트폴리오 핵심 대형주. 반도체 업황 회복 수혜. 안정성과 성장성 겸비한 균형 종목',
+    metrics: {
+      PER: 15.2,
+      PBR: 1.1,
+      ROE: 8.5,
+      debtRatio: 25.0,
+      profitGrowth: 10.5,
+      revenueGrowth: null,
+      dividendYield: 2.5,
+    },
+    upsidePotential: '+25%',
+    riskLevel: 'low',
+    confidenceScore: 90,
+  },
+  {
+    stockCode: '055550',
+    stockName: '신한지주',
+    market: 'KOSPI',
+    sector: '은행',
+    rationale:
+      '배당 수익 담당. 고배당 은행주로 포트폴리오 현금흐름 안정화. 저PBR 밸류업 수혜',
+    metrics: {
+      PER: 5.2,
+      PBR: 0.4,
+      ROE: 8.5,
+      debtRatio: null,
+      profitGrowth: null,
+      revenueGrowth: null,
+      dividendYield: 5.5,
+    },
+    upsidePotential: '+15% + 배당',
+    riskLevel: 'low',
+    confidenceScore: 88,
+  },
+  {
+    stockCode: '042700',
+    stockName: '한미반도체',
+    market: 'KOSDAQ',
+    sector: '반도체장비',
+    rationale:
+      '성장 담당. AI/HBM 수혜 고성장주. 포트폴리오 수익률 견인 역할. 비중 10% 권장',
+    metrics: {
+      PER: 35.0,
+      PBR: 8.0,
+      ROE: 25.0,
+      debtRatio: 15.0,
+      profitGrowth: 50.0,
+      revenueGrowth: 45.0,
+      dividendYield: 0.5,
+    },
+    upsidePotential: '+50%',
+    riskLevel: 'high',
+    confidenceScore: 75,
+  },
+]
+
 const DISCLAIMER = '본 분석은 AI 기반 참고 자료이며, 투자 권유가 아닙니다. 투자 판단은 본인 책임입니다.'
 
 interface MockStrategyData {
@@ -239,12 +569,71 @@ const MOCK_STRATEGY_DATA: Record<StrategyType, MockStrategyData | undefined> = {
     ],
     methodology: '10년 배당 지급 이력, 배당 성향 및 지속가능성 분석, 배당수익률 3% 이상 필터링',
   },
-  // Future strategies - not yet implemented
-  [StrategyType.INSIDER_TRADING]: undefined,
-  [StrategyType.THEME_VS_REAL]: undefined,
-  [StrategyType.SECTOR_ROTATION]: undefined,
-  [StrategyType.HIDDEN_GROWTH]: undefined,
-  [StrategyType.PORTFOLIO_DESIGNER]: undefined,
+  [StrategyType.INSIDER_TRADING]: {
+    title: '내부자 매수 신호 TOP 10',
+    summary: '임원 및 대주주의 자사주 매수는 강력한 투자 신호입니다. 경영진이 자기 돈으로 자사주를 사는 것은 회사의 미래에 대한 확신을 나타냅니다. 최근 6개월간 지속적인 내부자 매수가 있는 종목들을 선별했습니다.',
+    recommendations: mockInsiderTradingStocks,
+    defaultCount: 10,
+    marketContext: '금리 인상기 불확실성 속에서 내부자들의 매수 행위가 증가하고 있습니다. 특히 대형주보다 중소형주에서 의미 있는 신호가 포착되고 있습니다.',
+    risks: [
+      '내부자 매수가 항상 주가 상승으로 이어지지 않음',
+      '의무 보유 물량 매수 등 신호가 아닌 매수 가능성',
+      '정보 비대칭으로 인한 리스크',
+    ],
+    methodology: '최근 6개월 내부자 순매수 금액, 매수 빈도, 매수 후 주가 흐름, 재무 건전성 분석',
+  },
+  [StrategyType.THEME_VS_REAL]: {
+    title: '진짜 실적주 TOP 10',
+    summary: 'AI, 2차전지, 반도체 등 인기 테마주 중 실제 실적이 뒷받침되는 종목을 구분했습니다. 테마 관련 매출이 30% 이상이며 영업이익에 실질적으로 기여하는 진짜 실적주만 선별했습니다.',
+    recommendations: mockThemeVsRealStocks,
+    defaultCount: 10,
+    marketContext: '테마주 열풍 속에서 실적 없이 주가만 오른 종목과 실제 수혜주의 격차가 벌어지고 있습니다. 옥석 가리기가 필요한 시점입니다.',
+    risks: [
+      '테마 관련 수요 감소 시 실적 둔화 가능성',
+      '경쟁 심화로 인한 마진 하락',
+      '기술 변화에 따른 사업 모델 리스크',
+    ],
+    methodology: '테마 관련 매출 비중, 영업이익 기여도, 수주 잔고, 기술 경쟁력 분석',
+  },
+  [StrategyType.SECTOR_ROTATION]: {
+    title: '섹터 로테이션 유망주 TOP 10',
+    summary: '현재 경기 사이클과 금리/물가 동향을 분석하여 향후 6-12개월 유망 섹터를 전망했습니다. 금리 인하 수혜 섹터와 경기 회복 수혜주를 중심으로 선별했습니다.',
+    recommendations: mockSectorRotationStocks,
+    defaultCount: 10,
+    marketContext: '금리 인하 사이클 진입을 앞두고 있으며, 그동안 소외되었던 금융, 건설, 소비재 섹터의 반등이 예상됩니다. 반도체는 여전히 강세를 유지할 전망입니다.',
+    risks: [
+      '금리 인하 지연 시 섹터 로테이션 지연',
+      '글로벌 경기 침체 시 전 섹터 동반 하락',
+      '예상치 못한 정책 변화 리스크',
+    ],
+    methodology: '경기 사이클 분석, 금리/물가 전망, 섹터별 실적 추이, 밸류에이션 비교',
+  },
+  [StrategyType.HIDDEN_GROWTH]: {
+    title: '숨은 성장주 TOP 10',
+    summary: '시가총액 5000억원 이하의 중소형주 중 매출 성장률 20% 이상의 고성장 기업을 발굴했습니다. 기관 투자자들이 아직 주목하지 않은 숨은 보석들입니다.',
+    recommendations: mockHiddenGrowthStocks,
+    defaultCount: 10,
+    marketContext: '대형주 중심의 장세에서 중소형주는 상대적으로 소외되어 있습니다. 하지만 실적 성장이 뒷받침되는 종목들은 주가 재평가 가능성이 높습니다.',
+    risks: [
+      '유동성 부족으로 인한 변동성 리스크',
+      '대형주 대비 정보 비대칭',
+      '성장 지속성에 대한 불확실성',
+    ],
+    methodology: '시가총액 5000억 이하 필터링, 매출 성장률 20% 이상, 영업이익률 개선 추세 확인',
+  },
+  [StrategyType.PORTFOLIO_DESIGNER]: {
+    title: '균형 포트폴리오 TOP 10',
+    summary: '섹터, 시가총액, 투자 스타일을 분산한 균형 잡힌 포트폴리오를 설계했습니다. 안정적 수익과 성장을 동시에 추구하며, 시장 변동성에 대응할 수 있는 구성입니다.',
+    recommendations: mockPortfolioDesignerStocks,
+    defaultCount: 10,
+    marketContext: '불확실한 시장 환경에서 분산 투자의 중요성이 더욱 커지고 있습니다. 단일 섹터나 종목에 집중하기보다 균형 잡힌 포트폴리오 구성이 필요합니다.',
+    risks: [
+      '시장 전체 하락 시 분산 효과 제한적',
+      '개별 종목 리스크는 여전히 존재',
+      '리밸런싱 비용 발생',
+    ],
+    methodology: '섹터 분산(5개 이상), 시가총액 분산, 스타일 분산(가치/성장/배당), 상관관계 분석',
+  },
 }
 
 /**

@@ -51,7 +51,7 @@ const STRATEGIES: StrategyConfig[] = [
       '임원 및 대주주의 지속적인 자사주 매수 패턴을 분석합니다. 강한 매수 신호를 포착합니다.',
     icon: '👔',
     complexity: 'medium',
-    enabled: false,
+    enabled: true,
   },
   {
     strategyType: StrategyType.THEME_VS_REAL,
@@ -60,7 +60,7 @@ const STRATEGIES: StrategyConfig[] = [
       'AI, 배터리, 반도체 등 인기 테마에서 실제 실적이 뒷받침되는 종목을 구분합니다.',
     icon: '🎯',
     complexity: 'medium',
-    enabled: false,
+    enabled: true,
   },
   {
     strategyType: StrategyType.SECTOR_ROTATION,
@@ -69,7 +69,7 @@ const STRATEGIES: StrategyConfig[] = [
       '금리, 물가, 경기 지표를 바탕으로 향후 6-12개월 유망 섹터를 예측합니다.',
     icon: '🔄',
     complexity: 'high',
-    enabled: false,
+    enabled: true,
   },
   {
     strategyType: StrategyType.HIDDEN_GROWTH,
@@ -78,7 +78,7 @@ const STRATEGIES: StrategyConfig[] = [
       '시가총액이 작지만 높은 성장성을 가진 기업을 발굴합니다. 기관 유입 전 선점 기회를 제공합니다.',
     icon: '🚀',
     complexity: 'high',
-    enabled: false,
+    enabled: true,
   },
   {
     strategyType: StrategyType.PORTFOLIO_DESIGNER,
@@ -87,7 +87,7 @@ const STRATEGIES: StrategyConfig[] = [
       '투자 성향과 목표에 맞는 개인화된 포트폴리오를 설계합니다. 리밸런싱 전략도 함께 제공합니다.',
     icon: '📊',
     complexity: 'medium',
-    enabled: false,
+    enabled: true,
   },
 ]
 
