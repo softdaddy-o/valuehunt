@@ -5,6 +5,8 @@ from typing import Optional, List, Dict, Any
 from decimal import Decimal
 from pydantic import BaseModel, Field
 
+from app.schemas.insider_trading import InsiderTradingListResponse
+
 
 class StockBase(BaseModel):
     """Base stock schema"""
@@ -84,6 +86,7 @@ class StockDetailResponse(BaseModel):
     value_score: Dict[str, Any]
     ai_analysis: Dict[str, Any]
     financial_metrics: Dict[str, Any]
+    insider_trading: Optional[InsiderTradingListResponse] = None
     peer_comparison: Optional[List[Dict[str, Any]]] = None
     external_links: Optional[Dict[str, str]] = None
 

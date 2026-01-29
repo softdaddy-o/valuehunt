@@ -93,6 +93,13 @@ export const TERM_DEFINITIONS: Record<string, TermDefinition> = {
     brief: 'PER, PBR 등 가치평가 지표 기반 점수입니다.',
     detail: '주가가 기업의 실질 가치 대비 저평가되어 있는지 평가합니다. 최대 40점입니다.',
   },
+
+  // Insider Trading
+  내부자거래: {
+    label: '내부자 거래',
+    brief: '회사의 임원, 주요주주 등 내부 정보에 접근할 수 있는 자들의 주식 매매 활동입니다.',
+    detail: '내부자의 매수가 많으면 회사 전망에 대한 긍정적 신호로, 매도가 많으면 부정적 신호로 해석될 수 있습니다. 단, 스톡옵션 행사나 세금 납부 등의 이유로 매도하는 경우도 있으므로 맥락을 함께 고려해야 합니다.',
+  },
 }
 
 export function getTermDefinition(term: string): TermDefinition | undefined {

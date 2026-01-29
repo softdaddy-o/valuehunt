@@ -85,7 +85,7 @@ async def global_exception_handler(request, exc):
 
 
 # Import and include routers
-from app.api import auth, stocks, screener, watchlist, chat, ai
+from app.api import auth, stocks, screener, watchlist, chat, ai, backtest
 
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(stocks.router, prefix="/api/v1/stocks", tags=["Stocks"])
@@ -93,6 +93,7 @@ app.include_router(screener.router, prefix="/api/v1/screener", tags=["Screener"]
 app.include_router(watchlist.router, prefix="/api/v1/watchlist", tags=["Watchlist"])
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat"])
 app.include_router(ai.router, prefix="/api/v1/ai", tags=["AI"])
+app.include_router(backtest.router, prefix="/api/v1", tags=["Backtest"])
 
 
 if __name__ == "__main__":

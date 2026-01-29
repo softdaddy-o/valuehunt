@@ -242,6 +242,56 @@ class DartService:
 
         self._last_request_time = datetime.now()
 
+    def fetch_insider_trading(self, corp_code: str) -> Optional[pd.DataFrame]:
+        """
+        Fetch insider/executive stock ownership reports from DART
+
+        Args:
+            corp_code: 8-digit DART corporation code
+
+        Returns:
+            DataFrame with insider trading data or None if failed
+        """
+        try:
+            self._rate_limit()
+
+            logger.info(f"Fetching insider trading data for corp {corp_code}")
+
+            # Use OpenDartReader's major_shareholders_exec method
+            df = self.dart.report(corp=corp_code, key_word="임원ㆍ주요주주특정증권등소유상황보고서")
+
+            if df is None or df.empty:
+                logger.warning(f"No insider trading data for corp {corp_code}")
+                return None
+
+            logger.info(f"Successfully fetched {len(df)} insider trading records for {corp_code}")
+            return df
+
+        except Exception as e:
+            logger.error(f"Error fetching insider trading for {corp_code}: {e}")
+            return None
+
+    def fetch_insider_trading_by_stock_code(self, stock_code: str) -> Optional[pd.DataFrame]:
+        """
+        High-level method: Fetch insider trading data directly from stock code
+
+        Args:
+            stock_code: 6-digit Korean stock code
+
+        Returns:
+            DataFrame with insider trading data or None if failed
+        """
+        if not self.is_available():
+            logger.warning("DART service not available")
+            return None
+
+        corp_code = self.get_corp_code(stock_code)
+        if not corp_code:
+            logger.warning(f"Could not map {stock_code} to corp_code")
+            return None
+
+        return self.fetch_insider_trading(corp_code)
+
 
 # Singleton instance
 dart_service = DartService()

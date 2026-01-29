@@ -9,6 +9,8 @@ import { Watchlist } from '@/pages/Watchlist'
 import { Chat } from '@/pages/Chat'
 import { StrategySelector } from '@/pages/StrategySelector'
 import { StrategyResults } from '@/pages/StrategyResults'
+import Backtest from '@/pages/Backtest'
+import BacktestDetail from '@/pages/BacktestDetail'
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
           <Route path="/chat" element={<Chat />} />
           <Route path="/strategies" element={<StrategySelector />} />
           <Route path="/strategies/:strategyType" element={<StrategyResults />} />
+          <Route path="/backtest" element={<Backtest />} />
+          <Route path="/backtest/:id" element={<BacktestDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>

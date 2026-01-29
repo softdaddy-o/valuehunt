@@ -53,6 +53,12 @@ export function Navigation() {
               >
                 AI 챗
               </Link>
+              <Link
+                to="/backtest"
+                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                백테스트
+              </Link>
             </div>
           </div>
 

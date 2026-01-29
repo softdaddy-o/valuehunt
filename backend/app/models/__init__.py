@@ -6,6 +6,15 @@ from app.models.financial_metrics import FinancialMetrics
 from app.models.value_score import ValueScore
 from app.models.watchlist import Watchlist
 from app.models.screener_filter import ScreenerFilter
+from app.models.insider_trading import InsiderTrading
+from app.models.backtest import (
+    BacktestRun,
+    BacktestRecommendation,
+    BacktestSchedule,
+    HistoricalStockPrice,
+    HistoricalFinancialMetrics,
+    BacktestStatus,
+)
 
 __all__ = [
     "User",
@@ -14,4 +23,11 @@ __all__ = [
     "ValueScore",
     "Watchlist",
     "ScreenerFilter",
+    "InsiderTrading",
+    "BacktestRun",
+    "BacktestRecommendation",
+    "BacktestSchedule",
+    "HistoricalStockPrice",
+    "HistoricalFinancialMetrics",
+    "BacktestStatus",
 ]

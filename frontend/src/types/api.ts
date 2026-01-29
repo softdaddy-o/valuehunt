@@ -104,11 +104,45 @@ export interface FinancialMetrics {
   }
 }
 
+// Insider Trading Types
+export interface InsiderTrading {
+  id: number
+  stock_code: string
+  rcept_no: string
+  rcept_dt: string
+  corp_name: string | null
+  repror: string | null
+  isu_exctv_rgist_at: string | null  // 등기임원/비등기임원
+  isu_exctv_ofcps: string | null     // 직위
+  isu_main_shrholdr: string | null   // 주요주주 여부
+  sp_stock_lmp_cnt: number | null    // 소유 주식수
+  sp_stock_lmp_irds_cnt: number | null  // 증감 주식수
+  sp_stock_lmp_rate: number | null   // 소유 비율
+  sp_stock_lmp_irds_rate: number | null  // 증감 비율
+  transaction_type: string | null    // 매수/매도/변동없음
+}
+
+export interface InsiderTradingSummary {
+  total_transactions: number
+  net_buy_count: number
+  net_sell_count: number
+  largest_holder: string | null
+  largest_holding_rate: number | null
+  recent_trend: string  // 매수우세/매도우세/중립
+}
+
+export interface InsiderTradingList {
+  data: InsiderTrading[]
+  summary: InsiderTradingSummary
+  total_count: number
+}
+
 export interface StockDetail {
   stock_info: Stock
   value_score: ValueScore
   ai_analysis: AIAnalysis
   financial_metrics: FinancialMetrics
+  insider_trading: InsiderTradingList | null
   peer_comparison: any | null
   external_links: {
     dart: string

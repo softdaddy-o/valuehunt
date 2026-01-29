@@ -10,6 +10,7 @@ from app.db.database import get_db
 from app.models.stock import Stock
 from app.models.value_score import ValueScore
 from app.models.financial_metrics import FinancialMetrics
+from app.models.insider_trading import InsiderTrading
 from app.schemas.stock import (
     TopPicksResponse,
     TopPickItem,
@@ -17,6 +18,11 @@ from app.schemas.stock import (
     StockResponse,
     KeyMetrics,
     CategoryScores,
+)
+from app.schemas.insider_trading import (
+    InsiderTradingResponse,
+    InsiderTradingSummary,
+    InsiderTradingListResponse,
 )
 
 router = APIRouter()
@@ -204,11 +210,88 @@ def get_stock_detail(
         "news": f"https://finance.naver.com/item/main.nhn?code={stock_code}",
     }
 
+    # Get insider trading data (last 20 records)
+    insider_records = (
+        db.query(InsiderTrading)
+        .filter(InsiderTrading.stock_code == stock_code)
+        .order_by(desc(InsiderTrading.rcept_dt))
+        .limit(20)
+        .all()
+    )
+
+    # Build insider trading response
+    insider_trading = None
+    if insider_records:
+        insider_data = []
+        net_buy = 0
+        net_sell = 0
+        largest_holder = None
+        largest_rate = 0
+
+        for record in insider_records:
+            # Determine transaction type
+            tx_type = None
+            if record.sp_stock_lmp_irds_cnt is not None:
+                if record.sp_stock_lmp_irds_cnt > 0:
+                    tx_type = "매수"
+                    net_buy += 1
+                elif record.sp_stock_lmp_irds_cnt < 0:
+                    tx_type = "매도"
+                    net_sell += 1
+                else:
+                    tx_type = "변동없음"
+
+            # Track largest holder
+            if record.sp_stock_lmp_rate and float(record.sp_stock_lmp_rate) > largest_rate:
+                largest_rate = float(record.sp_stock_lmp_rate)
+                largest_holder = record.repror
+
+            insider_data.append(
+                InsiderTradingResponse(
+                    id=record.id,
+                    stock_code=record.stock_code,
+                    rcept_no=record.rcept_no,
+                    rcept_dt=record.rcept_dt,
+                    corp_name=record.corp_name,
+                    repror=record.repror,
+                    isu_exctv_rgist_at=record.isu_exctv_rgist_at,
+                    isu_exctv_ofcps=record.isu_exctv_ofcps,
+                    isu_main_shrholdr=record.isu_main_shrholdr,
+                    sp_stock_lmp_cnt=record.sp_stock_lmp_cnt,
+                    sp_stock_lmp_irds_cnt=record.sp_stock_lmp_irds_cnt,
+                    sp_stock_lmp_rate=record.sp_stock_lmp_rate,
+                    sp_stock_lmp_irds_rate=record.sp_stock_lmp_irds_rate,
+                    transaction_type=tx_type,
+                )
+            )
+
+        # Determine trend
+        if net_buy > net_sell:
+            trend = "매수우세"
+        elif net_sell > net_buy:
+            trend = "매도우세"
+        else:
+            trend = "중립"
+
+        insider_trading = InsiderTradingListResponse(
+            data=insider_data,
+            summary=InsiderTradingSummary(
+                total_transactions=len(insider_records),
+                net_buy_count=net_buy,
+                net_sell_count=net_sell,
+                largest_holder=largest_holder,
+                largest_holding_rate=largest_rate if largest_rate > 0 else None,
+                recent_trend=trend,
+            ),
+            total_count=len(insider_records),
+        )
+
     return StockDetailResponse(
         stock_info=stock,
         value_score=value_score,
         ai_analysis=ai_analysis,
         financial_metrics=financial_metrics,
+        insider_trading=insider_trading,
         peer_comparison=None,  # TODO: Implement peer comparison
         external_links=external_links,
     )

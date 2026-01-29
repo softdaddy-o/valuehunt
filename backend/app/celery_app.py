@@ -54,4 +54,9 @@ celery_app.conf.beat_schedule = {
         "task": "app.tasks.dart_tasks.update_corp_code_cache_task",
         "schedule": crontab(hour=1, minute=0, day_of_month=1),
     },
+    # Weekly insider trading data collection - Every Monday at 3 AM
+    "collect-insider-trading-weekly": {
+        "task": "app.tasks.insider_tasks.fetch_all_insider_trading_task",
+        "schedule": crontab(hour=3, minute=0, day_of_week=1),
+    },
 }

@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { TermTooltip } from '@/components/ui/TermTooltip'
 import { StockChart } from '@/components/StockChart'
+import { InsiderTradingCard } from '@/components/InsiderTradingCard'
 
 export function StockDetail() {
   const { stockCode } = useParams<{ stockCode: string }>()
@@ -232,6 +233,11 @@ export function StockDetail() {
                 />
               </div>
             </Card>
+
+            {/* Insider Trading */}
+            {stock.insider_trading && stock.insider_trading.data.length > 0 && (
+              <InsiderTradingCard data={stock.insider_trading} />
+            )}
           </div>
 
           {/* Right Column */}

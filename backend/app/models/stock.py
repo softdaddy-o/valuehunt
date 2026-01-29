@@ -38,6 +38,12 @@ class Stock(Base, TimestampMixin):
         back_populates="stock",
         cascade="all, delete-orphan",
     )
+    insider_trading = relationship(
+        "InsiderTrading",
+        back_populates="stock",
+        cascade="all, delete-orphan",
+        order_by="InsiderTrading.rcept_dt.desc()",
+    )
 
     def __repr__(self):
         return f"<Stock(code={self.code}, name={self.name}, market={self.market})>"
