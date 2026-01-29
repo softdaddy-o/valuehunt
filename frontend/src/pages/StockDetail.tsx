@@ -283,6 +283,19 @@ export function StockDetail() {
                 </a>
               </div>
             </Card>
+
+            {/* Backtest - Dev Only */}
+            {import.meta.env.DEV && (
+              <Card>
+                <h3 className="font-semibold text-gray-900 mb-3">개발자 도구</h3>
+                <Button
+                  onClick={() => navigate('/backtest')}
+                  className="w-full"
+                >
+                  Backtest →
+                </Button>
+              </Card>
+            )}
           </div>
         </div>
       </div>
